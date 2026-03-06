@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#4a5e40">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Movement">
+<meta name="description" content="15-minute daily bodyweight exercise routine">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<title>Daily Movement Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sand: #f5f0e8;
+    --cream: #faf8f3;
+    --bark: #2c2416;
+    --moss: #4a5e40;
+    --clay: #b5735a;
+    --mist: #8a9e96;
+    --gold: #c8a96e;
+    --pale-moss: #dde8da;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  body {
+    background: var(--cream);
+    color: var(--bark);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overscroll-behavior: none;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px calc(100px + var(--safe-bottom));
+    padding-top: max(52px, calc(var(--safe-top) + 20px));
+    position: relative;
+    z-index: 1;
+  }
+
+  /* INSTALL BANNER */
+  #installBanner {
+    display: none;
+    background: var(--moss);
+    color: white;
+    padding: 12px 20px;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  #installBanner.show { display: flex; }
+  #installBanner span { flex: 1; }
+  #installBanner button {
+    background: white;
+    color: var(--moss);
+    border: none;
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  #installBanner .dismiss {
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-size: 18px;
+    padding: 0 4px;
+  }
+
+  /* OFFLINE BADGE */
+  #offlineBadge {
+    display: none;
+    position: fixed;
+    top: max(16px, calc(var(--safe-top) + 8px));
+    right: 16px;
+    background: var(--clay);
+    color: white;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    z-index: 200;
+  }
+
+  /* STREAK */
+  .streak-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 36px;
+    padding: 12px 16px;
+    background: rgba(200,169,110,0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(200,169,110,0.25);
+  }
+  .streak-icon { font-size: 20px; }
+  .streak-text { font-size: 13px; color: var(--bark); }
+  .streak-text strong { color: var(--clay); font-weight: 500; }
+
+  header {
+    padding-bottom: 36px;
+    border-bottom: 1px solid rgba(44,36,22,0.12);
+    margin-bottom: 32px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 6vw, 54px);
+    line-height: 1.05;
+    color: var(--bark);
+    margin-bottom: 16px;
+  }
+
+  h1 em { color: var(--moss); font-style: italic; }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--mist);
+    line-height: 1.6;
+    max-width: 420px;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 32px;
+    margin-top: 28px;
+  }
+
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+
+  .meta-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mist);
+  }
+
+  .meta-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--bark);
+  }
+
+  .day-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+
+  .day-tab {
+    padding: 8px 18px;
+    border: 1px solid rgba(44,36,22,0.15);
+    background: transparent;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--bark);
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .day-tab:hover { border-color: var(--moss); color: var(--moss); }
+  .day-tab.active { background: var(--moss); border-color: var(--moss); color: white; }
+  .day-tab.completed-tab { border-color: var(--gold); color: var(--gold); }
+  .day-tab.completed-tab.active { background: var(--gold); color: white; }
+
+  .day-focus {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--pale-moss);
+    color: var(--moss);
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .focus-dot {
+    width: 6px; height: 6px;
+    background: var(--moss);
+    border-radius: 50%;
+  }
+
+  .phase-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(181,115,90,0.2);
+  }
+
+  .exercises {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+
+  .exercise-card {
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 0 20px;
+    align-items: start;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 4px;
+    padding: 18px 12px;
+    margin: 0 -12px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .exercise-card:active { background: rgba(74,94,64,0.08); }
+  .exercise-card:hover { background: rgba(74,94,64,0.04); }
+
+  .exercise-card.done .exercise-name {
+    text-decoration: line-through;
+    color: var(--mist);
+  }
+
+  .exercise-card.done .exercise-num {
+    background: var(--moss);
+    color: white;
+    border-color: var(--moss);
+  }
+
+  .exercise-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(44,36,22,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--mist);
+    transition: all 0.2s;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .exercise-body { display: flex; flex-direction: column; gap: 4px; }
+
+  .exercise-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 19px;
+    color: var(--bark);
+    line-height: 1.2;
+    transition: color 0.2s;
+  }
+
+  .exercise-desc {
+    font-size: 13px;
+    color: var(--mist);
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+
+  .exercise-metric {
+    font-size: 13px;
+    color: var(--clay);
+    font-weight: 500;
+    text-align: right;
+    white-space: nowrap;
+    padding-top: 4px;
+  }
+
+  /* STICKY PROGRESS BAR */
+  .progress-section {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 748px;
+    background: var(--bark);
+    color: white;
+    border-radius: 16px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 8px 32px rgba(44,36,22,0.25);
+    z-index: 50;
+  }
+
+  .progress-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-wrap {
+    flex: 1;
+    background: rgba(255,255,255,0.12);
+    border-radius: 100px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 100px;
+    transition: width 0.4s ease;
+  }
+
+  .reset-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .reset-btn:hover { background: rgba(255,255,255,0.2); }
+
+  .tip-box {
+    background: rgba(200,169,110,0.1);
+    border-left: 3px solid var(--gold);
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    color: var(--bark);
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+  .tip-box strong { color: var(--clay); font-weight: 500; }
+
+  /* COMPLETION OVERLAY */
+  .completion-toast {
+    position: fixed;
+    top: max(80px, calc(var(--safe-top) + 60px));
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--moss);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    box-shadow: 0 8px 24px rgba(74,94,64,0.3);
+    opacity: 0;
+    transition: all 0.4s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 300;
+  }
+  .completion-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  #offlineBadge.show { display: block; }
+
+  @media (max-width: 480px) {
+    .header-meta { gap: 20px; }
+    .exercise-card { grid-template-columns: 44px 1fr auto; gap: 0 12px; }
+    .exercise-name { font-size: 17px; }
+    .progress-section { padding: 14px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="installBanner">
+  <span>Add to your home screen for the full app experience.</span>
+  <button id="installBtn">Install</button>
+  <button class="dismiss" id="dismissBanner">×</button>
+</div>
+
+<div id="offlineBadge">Offline</div>
+<div class="completion-toast" id="toast">🌿 Day complete!</div>
+
+<div class="container">
+  <header>
+    <p class="eyebrow">At-Home · No Equipment</p>
+    <h1>Daily <em>Movement</em><br>Practice</h1>
+    <p class="subtitle">15 minutes a day. Built for balance, tone, and a body that moves well.</p>
+    <div class="header-meta">
+      <div class="meta-item">
+        <span class="meta-label">Duration</span>
+        <span class="meta-value">15 min</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Equipment</span>
+        <span class="meta-value">None</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Goal</span>
+        <span class="meta-value">Tone & Balance</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="streak-bar">
+    <span class="streak-icon">🔥</span>
+    <span class="streak-text">Streak: <strong id="streakCount">0 days</strong> &nbsp;·&nbsp; Total sessions: <strong id="totalSessions">0</strong></span>
+  </div>
+
+  <div class="day-tabs" id="dayTabs"></div>
+  <div id="dayContent"></div>
+
+  <div class="progress-section">
+    <span class="progress-text" id="progressText">0 / 0</span>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <button class="reset-btn" onclick="resetDay()">Reset</button>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const days = [
+  {
+    name: "Mon", full: "Monday", focus: "Lower Body & Balance",
+    tip: "<strong>Form first:</strong> On single-leg moves, find a fixed point to gaze at — it instantly improves stability.",
+    warmup: [
+      { name: "Hip Circles", desc: "Stand with hands on hips, draw slow circles to open the hip joint.", metric: "10 each side" },
+      { name: "Ankle Rolls", desc: "Lift one foot, rotate slowly in both directions.", metric: "8 each side" },
+    ],
+    exercises: [
+      { name: "Bodyweight Squat", desc: "Feet hip-width, chest tall, lower until thighs are parallel. Drive through heels.", metric: "3 × 12" },
+      { name: "Reverse Lunge", desc: "Step back, lower back knee toward floor. Keep front shin vertical.", metric: "3 × 10 each" },
+      { name: "Single-Leg Deadlift", desc: "Hinge forward on one leg, extend the other back. Feel the hamstring load.", metric: "2 × 8 each" },
+      { name: "Lateral Step", desc: "Mini squat, step side-to-side with control.", metric: "2 × 12 each" },
+      { name: "Calf Raise", desc: "Stand on the edge of a step. Rise slowly, lower with control.", metric: "2 × 15" },
+    ],
+    cooldown: [
+      { name: "Standing Quad Stretch", desc: "Hold for a breath, feel the front of the thigh open.", metric: "30s each" },
+      { name: "Low Lunge Hip Flexor", desc: "Back knee on the floor, press hips forward gently.", metric: "30s each" },
+    ]
+  },
+  {
+    name: "Tue", full: "Tuesday", focus: "Core & Stability",
+    tip: "<strong>Breath matters:</strong> Exhale on the hardest part of every rep. It activates deep core muscles automatically.",
+    warmup: [
+      { name: "Cat-Cow", desc: "On hands and knees, flow between arching and rounding the spine with breath.", metric: "8 slow reps" },
+      { name: "Thread the Needle", desc: "From a quadruped position, reach one arm under your body and rotate.", metric: "6 each side" },
+    ],
+    exercises: [
+      { name: "Dead Bug", desc: "Lie on back. Extend opposite arm and leg simultaneously, keeping low back pressed down.", metric: "3 × 8 each" },
+      { name: "Plank Hold", desc: "Forearms on floor, body in a straight line. Don't let the hips sag or rise.", metric: "3 × 25s" },
+      { name: "Side Plank", desc: "Stack feet or stagger them. Hold the body in a diagonal line.", metric: "2 × 20s each" },
+      { name: "Bird Dog", desc: "From all fours, extend opposite arm and leg. Hold 2 seconds at the top.", metric: "3 × 8 each" },
+      { name: "Hollow Body Hold", desc: "Lie flat, press lower back into floor, raise arms and legs slightly. Hold.", metric: "3 × 15s" },
+    ],
+    cooldown: [
+      { name: "Child's Pose", desc: "Arms extended forward, breathe into the lower back.", metric: "40s" },
+      { name: "Supine Twist", desc: "Lie on your back, bring knees to one side, arms open.", metric: "30s each" },
+    ]
+  },
+  {
+    name: "Wed", full: "Wednesday", focus: "Upper Body & Posture",
+    tip: "<strong>Mind your shoulders:</strong> Keep them away from your ears on every push. This builds the lean, defined look rather than bulk.",
+    warmup: [
+      { name: "Arm Circles", desc: "Big slow circles forward and backward to warm the shoulder joint.", metric: "10 each direction" },
+      { name: "Wall Chest Opener", desc: "Place forearm on wall, rotate body gently to open the chest.", metric: "30s each" },
+    ],
+    exercises: [
+      { name: "Push-Up", desc: "Hands slightly wider than shoulders. Lower until chest nearly touches. Modify on knees if needed.", metric: "3 × 10" },
+      { name: "Wide Push-Up", desc: "Hands wider than shoulder-width to emphasize the outer chest and rear shoulder.", metric: "2 × 8" },
+      { name: "Tricep Dip", desc: "Use a chair or low surface. Elbows point back, not flared.", metric: "3 × 10" },
+      { name: "Pike Push-Up", desc: "Hips high in a V-shape. Lower your head toward the floor — targets shoulders.", metric: "2 × 8" },
+      { name: "Superman Hold", desc: "Lie face down, lift chest and legs simultaneously. Squeeze glutes and upper back.", metric: "3 × 8, 2s hold" },
+    ],
+    cooldown: [
+      { name: "Doorway Chest Stretch", desc: "Arms at 90°, lean through a doorway to open the pecs.", metric: "30s" },
+      { name: "Cross-Body Shoulder Stretch", desc: "Pull one arm gently across your chest.", metric: "20s each" },
+    ]
+  },
+  {
+    name: "Thu", full: "Thursday", focus: "Mobility & Active Recovery",
+    tip: "<strong>This is not a rest day — it's a performance day.</strong> Mobility work prevents injury, improves posture, and makes every other session more effective.",
+    warmup: [
+      { name: "March in Place", desc: "Drive knees up, swing arms. Get the body gently warm.", metric: "60 seconds" },
+    ],
+    exercises: [
+      { name: "World's Greatest Stretch", desc: "Lunge forward, place same-side hand inside foot, rotate and reach toward ceiling.", metric: "5 each side" },
+      { name: "90/90 Hip Stretch", desc: "Sit on the floor with front and back legs at 90°. Sit tall and lean gently forward.", metric: "45s each side" },
+      { name: "Thoracic Extension", desc: "Lie on your back, hands behind head, gently arch upper back over a rolled towel.", metric: "8 reps" },
+      { name: "Deep Squat Hold", desc: "Hold a doorframe for balance if needed. Sink into a full squat, heels flat.", metric: "3 × 30s" },
+      { name: "Standing Balance Reach", desc: "Balance on one leg, slowly reach one arm forward, side, and back without wobbling.", metric: "6 reaches each leg" },
+    ],
+    cooldown: [
+      { name: "Legs Up the Wall", desc: "Lie near a wall, legs extended up. A powerful recovery pose.", metric: "60s" },
+    ]
+  },
+  {
+    name: "Fri", full: "Friday", focus: "Full Body Circuit",
+    tip: "<strong>Move with intention:</strong> Keep rest between exercises to 20-30 seconds. The goal is a sustained, slightly elevated heart rate — not exhaustion.",
+    warmup: [
+      { name: "Jumping Jacks", desc: "Light and easy — just to warm up the cardiovascular system.", metric: "30 seconds" },
+      { name: "Hip Opener Steps", desc: "Step forward and draw your knee out to the side as you bring it up.", metric: "8 each leg" },
+    ],
+    exercises: [
+      { name: "Squat to Press", desc: "Squat down, as you rise, press both arms overhead. Full body engagement.", metric: "3 × 10" },
+      { name: "Push-Up to T", desc: "After each push-up, rotate into a side plank and reach the top arm up.", metric: "2 × 6 each" },
+      { name: "Reverse Lunge + Twist", desc: "Step back into a lunge, rotate your torso toward the front knee at the bottom.", metric: "2 × 8 each" },
+      { name: "Glute Bridge", desc: "Feet flat on floor, drive hips up, squeeze at the top for 1 second.", metric: "3 × 15" },
+      { name: "Mountain Climbers (slow)", desc: "In plank, drive knees to chest alternately with full control. No rushing.", metric: "2 × 20 total" },
+    ],
+    cooldown: [
+      { name: "Pigeon Pose", desc: "Bring one shin forward on the mat (or lie on your back and cross ankle over knee).", metric: "40s each" },
+      { name: "Full Body Stretch", desc: "Lie flat, extend arms overhead, take 3 deep breaths and feel everything lengthen.", metric: "30s" },
+    ]
+  },
+  {
+    name: "Sat", full: "Saturday", focus: "Balance & Coordination",
+    tip: "<strong>Challenge your nervous system:</strong> Balance training is one of the most underrated forms of exercise for a lean, controlled physique.",
+    warmup: [
+      { name: "Slow High Knees", desc: "March in place, driving knees up with each step. Arms pump naturally.", metric: "45 seconds" },
+      { name: "Ankle Pumps", desc: "Flex and point each foot to wake up the stabilizers.", metric: "10 each" },
+    ],
+    exercises: [
+      { name: "Single-Leg Squat (assisted)", desc: "Hold a doorframe lightly for balance. Lower on one leg, keep the knee tracking over toes.", metric: "3 × 6 each" },
+      { name: "Tandem Walk", desc: "Walk heel-to-toe in a straight line, arms out. Go slowly for maximum challenge.", metric: "3 × 10 steps" },
+      { name: "Balance on Towel", desc: "Stand on one foot on a folded towel. Close eyes for extra challenge. Switch.", metric: "3 × 20s each" },
+      { name: "Lateral Step-Over", desc: "Imagine a line on the floor. Step laterally over it with control, landing softly.", metric: "2 × 10 each" },
+      { name: "Standing Hip Hinge", desc: "With eyes closed, hinge forward slowly on one leg. Builds deep proprioception.", metric: "2 × 6 each" },
+    ],
+    cooldown: [
+      { name: "Seated Forward Fold", desc: "Legs extended, reach for your feet. Breathe and sink deeper with each exhale.", metric: "40s" },
+      { name: "Neck Release", desc: "Tilt ear to shoulder, hold gently. No forcing.", metric: "20s each side" },
+    ]
+  },
+  {
+    name: "Sun", full: "Sunday", focus: "Stretch & Reset",
+    tip: "<strong>Recovery is training.</strong> This session is how you build lean tissue — the muscle repairs and tones during rest, not during the workout.",
+    warmup: [],
+    exercises: [
+      { name: "Full Body Roll-Down", desc: "Stand tall, slowly roll down vertebra by vertebra. Hang for a breath, roll back up.", metric: "5 slow reps" },
+      { name: "Seated Spinal Twist", desc: "Sit cross-legged, place one hand behind you, rotate and hold. Breathe deeply.", metric: "45s each" },
+      { name: "Lying Hamstring Stretch", desc: "Lie on back, hold behind one thigh and straighten the leg toward ceiling.", metric: "40s each" },
+      { name: "Figure-4 Glute Stretch", desc: "Lying on back, cross ankle over opposite knee, pull both legs toward chest.", metric: "40s each" },
+      { name: "Chest Opener", desc: "Lie on your back, arms wide in a T. Breathe into the chest and let it open.", metric: "60s" },
+    ],
+    cooldown: [
+      { name: "Savasana Breathing", desc: "Lie completely flat. 4-count inhale, 6-count exhale. Let the week go.", metric: "2 minutes" },
+    ]
+  }
+];
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let currentDay = (new Date().getDay() + 6) % 7;
+let completed = {};
+let stats = { streak: 0, total: 0, lastDate: null, completedDates: [] };
+let prevDayComplete = {};
+
+function saveState() {
+  localStorage.setItem('movement_completed', JSON.stringify(completed));
+  localStorage.setItem('movement_stats', JSON.stringify(stats));
+}
+
+function loadState() {
+  try {
+    const c = localStorage.getItem('movement_completed');
+    if (c) completed = JSON.parse(c);
+    const s = localStorage.getItem('movement_stats');
+    if (s) stats = JSON.parse(s);
+  } catch(e) {}
+}
+
+// ─── STREAK ─────────────────────────────────────────────────────────────────
+function updateStreak() {
+  document.getElementById('streakCount').textContent =
+    stats.streak === 1 ? '1 day' : `${stats.streak} days`;
+  document.getElementById('totalSessions').textContent = stats.total;
+}
+
+function checkDayComplete(dayIndex) {
+  const day = days[dayIndex];
+  const all = [...(day.warmup||[]), ...day.exercises, ...(day.cooldown||[])];
+  const key = `day_${dayIndex}`;
+  const done = completed[key] || {};
+  return all.length > 0 && all.every((_, i) => {
+    const phases = [
+      ...(day.warmup||[]).map((_,i)=>`w_${i}`),
+      ...day.exercises.map((_,i)=>`e_${i}`),
+      ...(day.cooldown||[]).map((_,i)=>`c_${i}`)
+    ];
+    return done[phases[all.indexOf(all[i])]];  // crude but works
+  });
+}
+
+function onDayComplete(dayIndex) {
+  const today = new Date().toDateString();
+  if (!stats.completedDates) stats.completedDates = [];
+  if (!stats.completedDates.includes(today)) {
+    stats.completedDates.push(today);
+    stats.total = (stats.total || 0) + 1;
+    // streak
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (stats.lastDate === yesterday || stats.lastDate === today) {
+      if (stats.lastDate !== today) stats.streak = (stats.streak || 0) + 1;
+    } else {
+      stats.streak = 1;
+    }
+    stats.lastDate = today;
+    saveState();
+    updateStreak();
+  }
+  showToast();
+}
+
+function showToast() {
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────
+function getAllExerciseIds(day) {
+  return [
+    ...(day.warmup||[]).map((_,i)=>`w_${i}`),
+    ...day.exercises.map((_,i)=>`e_${i}`),
+    ...(day.cooldown||[]).map((_,i)=>`c_${i}`)
+  ];
+}
+
+function renderTabs() {
+  document.getElementById('dayTabs').innerHTML = days.map((d, i) => {
+    const ids = getAllExerciseIds(d);
+    const done = completed[`day_${i}`] || {};
+    const isComplete = ids.length > 0 && ids.every(id => done[id]);
+    return `<button class="day-tab ${i === currentDay ? 'active' : ''} ${isComplete ? 'completed-tab' : ''}"
+      onclick="switchDay(${i})">${d.name}${isComplete ? ' ✓' : ''}</button>`;
+  }).join('');
+}
+
+function renderDay() {
+  const day = days[currentDay];
+  const key = `day_${currentDay}`;
+  if (!completed[key]) completed[key] = {};
+  const done = completed[key];
+  const ids = getAllExerciseIds(day);
+  const doneCount = ids.filter(id => done[id]).length;
+
+  let html = `
+    <div class="day-focus"><span class="focus-dot"></span>${day.focus}</div>
+    <div class="tip-box">💡 ${day.tip}</div>`;
+
+  if (day.warmup?.length) {
+    html += `<p class="phase-label">Warm-Up · 2 min</p><div class="exercises">`;
+    day.warmup.forEach((ex, i) => { html += card(ex, `w_${i}`, done[`w_${i}`]); });
+    html += `</div>`;
+  }
+
+  html += `<p class="phase-label">Main Workout · ${day.warmup?.length ? '10' : '13'} min</p><div class="exercises">`;
+  day.exercises.forEach((ex, i) => { html += card(ex, `e_${i}`, done[`e_${i}`]); });
+  html += `</div>`;
+
+  if (day.cooldown?.length) {
+    html += `<p class="phase-label">Cool-Down · 2–3 min</p><div class="exercises">`;
+    day.cooldown.forEach((ex, i) => { html += card(ex, `c_${i}`, done[`c_${i}`]); });
+    html += `</div>`;
+  }
+
+  document.getElementById('dayContent').innerHTML = html;
+
+  const pct = ids.length ? Math.round((doneCount / ids.length) * 100) : 0;
+  document.getElementById('progressText').textContent = `${doneCount} / ${ids.length}`;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function card(ex, id, isDone) {
+  return `<div class="exercise-card ${isDone ? 'done' : ''}" onclick="toggle('${id}')">
+    <div class="exercise-num">${isDone ? '✓' : ''}</div>
+    <div class="exercise-body">
+      <div class="exercise-name">${ex.name}</div>
+      <div class="exercise-desc">${ex.desc}</div>
+    </div>
+    <div class="exercise-metric">${ex.metric}</div>
+  </div>`;
+}
+
+function toggle(id) {
+  const key = `day_${currentDay}`;
+  if (!completed[key]) completed[key] = {};
+  completed[key][id] = !completed[key][id];
+  saveState();
+
+  // Check if just completed
+  const ids = getAllExerciseIds(days[currentDay]);
+  const done = completed[key];
+  const wasComplete = prevDayComplete[currentDay];
+  const isNowComplete = ids.length > 0 && ids.every(i => done[i]);
+  if (!wasComplete && isNowComplete) {
+    prevDayComplete[currentDay] = true;
+    onDayComplete(currentDay);
+  }
+
+  renderTabs();
+  renderDay();
+}
+
+function switchDay(i) {
+  currentDay = i;
+  renderTabs();
+  renderDay();
+}
+
+function resetDay() {
+  completed[`day_${currentDay}`] = {};
+  prevDayComplete[currentDay] = false;
+  saveState();
+  renderTabs();
+  renderDay();
+}
+
+// ─── PWA ────────────────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(console.warn);
+}
+
+// Offline badge
+window.addEventListener('online', () => document.getElementById('offlineBadge').classList.remove('show'));
+window.addEventListener('offline', () => document.getElementById('offlineBadge').classList.add('show'));
+if (!navigator.onLine) document.getElementById('offlineBadge').classList.add('show');
+
+// Install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+
+document.getElementById('installBtn').addEventListener('click', () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.remove('show');
+    });
+  }
+});
+
+document.getElementById('dismissBanner').addEventListener('click', () => {
+  document.getElementById('installBanner').classList.remove('show');
+});
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+loadState();
+updateStreak();
+renderTabs();
+renderDay();
+</script>
+</body>
+</html>
